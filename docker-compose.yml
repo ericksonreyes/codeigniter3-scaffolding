@@ -16,7 +16,7 @@ services:
       - 'mysql_data:/var/lib/mysql'
     restart: unless-stopped
     ports:
-      - '3307:3306'
+      - '3306:3306'
 
 
 
