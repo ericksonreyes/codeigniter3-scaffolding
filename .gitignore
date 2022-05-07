@@ -1,0 +1,9 @@
+/.composer
+/.idea
+/node_modules
+/vendor
+/bin
+.DS_Store
+.env
+*.bak
+/storage

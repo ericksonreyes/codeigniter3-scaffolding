@@ -1,0 +1,23 @@
+FROM php:8.0-cli-alpine
+
+RUN apk update && apk add curl git wget
+
+RUN apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS
+
+RUN pecl update-channels
+
+RUN docker-php-ext-install pdo pdo_mysql bcmath sockets opcache && docker-php-ext-enable opcache && pecl install apcu && docker-php-ext-enable apcu # && pecl install pcov && docker-php-ext-enable pcov
+
+WORKDIR /usr/local/etc/php/conf.d/
+
+COPY config/docker/config/php/php.ini .
+
+RUN touch /var/log/php_error.log && chown -R www-data:www-data /var/log/php_error.log
+
+WORKDIR /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html
+
+COPY . .
+
+ENTRYPOINT [ "php"]

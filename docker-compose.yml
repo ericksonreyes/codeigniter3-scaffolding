@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    build:
+      context: .
+      dockerfile: config/docker/mysql.Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+    volumes:
+      - './storage/mysql:/var/log/mysql:delegated'
+      - 'mysql_data:/var/lib/mysql'
+    restart: unless-stopped
+    ports:
+      - '3307:3306'
+
+
+
+  composer:
+    build:
+      context: .
+      dockerfile: config/docker/composer.Dockerfile
+    volumes:
+      - './:/var/www/html:delegated'
+      - 'composer_cache:/tmp'
+    tty: true
+    network_mode: host
+
+
+
+  php:
+    build:
+      context: .
+      dockerfile: config/docker/php.Dockerfile
+    volumes:
+      - './storage/php/php_error.log:/var/log/php_error.log:delegated'
+      - './:/var/www/html:delegated'
+    tty: true
+
+
+
+  app:
+    build:
+      context: .
+      dockerfile: config/docker/apache.Dockerfile
+    ports:
+      - '80:80'
+    volumes:
+      - './:/var/www/html:delegated'
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+
+
+volumes:
+  mysql_data:
+  composer_cache:
